@@ -1,0 +1,599 @@
+const SUPABASE_URL = "https://nrgdowdzzrlkxgjsfadp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-";
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stroop Test</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #202938;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 5px 24px #17203312;
+    }
+
+    h1, h2 { text-align: center; }
+    h1 { margin-top: 0; }
+    .muted { color: #657185; text-align: center; line-height: 1.6; }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd2de;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 18px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .primary {
+      width: 100%;
+      margin-top: 20px;
+      background: #315bd6;
+      color: white;
+    }
+
+    .status {
+      text-align: center;
+      background: #f0f3f8;
+      padding: 14px;
+      border-radius: 10px;
+      line-height: 1.7;
+    }
+
+    .stimulus {
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(42px, 10vw, 68px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .choice { color: white; min-height: 52px; }
+    .red { background: #d92535; }
+    .blue { background: #2364d8; }
+    .green { background: #16834b; }
+    .yellow { background: #e4bd18; color: #202020; }
+
+    .hidden { display: none !important; }
+
+    .progress {
+      height: 9px;
+      background: #e4e8ef;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 14px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #315bd6;
+      transition: width 0.2s linear;
+    }
+
+    .result {
+      padding: 12px;
+      margin-top: 10px;
+      background: #f3f5f9;
+      border-radius: 8px;
+    }
+
+    .small { font-size: 13px; }
+  </style>
+</head>
+
+<body>
+<main>
+  <h1>Stroop Test</h1>
+
+  <section id="intro">
+    <p class="muted">
+      This test contains six parts. Each part lasts 60 seconds.
+      Read the instructions carefully and respond as quickly and
+      accurately as you can.
+    </p>
+
+    <label for="participantName">Participant label (optional)</label>
+    <input id="participantName" maxlength="80"
+      placeholder="Use a nickname or anonymous code">
+
+    <p class="muted small">
+      Your responses and reaction times will be saved to the study database
+      when the database is configured correctly.
+    </p>
+
+    <button class="primary" id="startButton">Start test</button>
+  </section>
+
+  <section id="test" class="hidden">
+    <div class="status">
+      <strong id="partTitle">Part 1</strong><br>
+      <span id="instructions"></span><br>
+      Time left: <strong id="timeLeft">60</strong> seconds
+      &nbsp; | &nbsp; Trials: <strong id="trialCount">0</strong>
+    </div>
+
+    <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+
+    <div id="stimulus" class="stimulus" aria-live="polite">READY</div>
+
+    <div class="choices">
+      <button class="choice red" data-color="RED">RED (R)</button>
+      <button class="choice blue" data-color="BLUE">BLUE (B)</button>
+      <button class="choice green" data-color="GREEN">GREEN (G)</button>
+      <button class="choice yellow" data-color="YELLOW">YELLOW (Y)</button>
+    </div>
+
+    <p class="muted small">
+      Use the R, B, G or Y key, or click a colour button.
+    </p>
+    <p id="feedback" class="muted" aria-live="polite"></p>
+  </section>
+
+  <section id="results" class="hidden">
+    <h2>Test complete!</h2>
+    <p class="muted" id="saveStatus">Preparing your results...</p>
+    <div id="summary"></div>
+    <button class="primary" id="downloadButton">Download results as CSV</button>
+    <button class="primary" id="restartButton">Start a new test</button>
+  </section>
+</main>
+
+<script>
+  // Replace these two values with your Supabase project details.
+  const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+  const COLORS = ["RED", "BLUE", "GREEN", "YELLOW"];
+  const COLOR_HEX = {
+    RED: "#d92535",
+    BLUE: "#2364d8",
+    GREEN: "#16834b",
+    YELLOW: "#d4ad08"
+  };
+  const KEY_TO_COLOR = {
+    r: "RED", b: "BLUE", g: "GREEN", y: "YELLOW"
+  };
+  const PART_SECONDS = 60;
+
+  const PARTS = [
+    {
+      name: "Part 1 — Word reading",
+      instruction: "Read the word itself, ignoring its font colour.",
+      task: "word",
+      type: "word-reading"
+    },
+    {
+      name: "Part 2 — Word BLUE",
+      instruction: "Choose the word you read, ignoring its font colour.",
+      task: "word",
+      type: "blue-word"
+    },
+    {
+      name: "Part 3 — Congruent",
+      instruction: "Choose the font colour. The word and colour match.",
+      task: "ink",
+      type: "congruent"
+    },
+    {
+      name: "Part 4 — Incongruent",
+      instruction: "Choose the font colour, not the word meaning.",
+      task: "ink",
+      type: "incongruent"
+    },
+    {
+      name: "Part 5 — Congruent practice",
+      instruction: "Practice: choose the font colour.",
+      task: "ink",
+      type: "congruent"
+    },
+    {
+      name: "Part 6 — Incongruent practice",
+      instruction: "Practice: choose the font colour, not the word.",
+      task: "ink",
+      type: "incongruent"
+    }
+  ];
+
+  const $ = id => document.getElementById(id);
+
+  let db = null;
+  let participantId = "";
+  let sessionId = "";
+  let participantName = "";
+  let partIndex = 0;
+  let partStartedAt = 0;
+  let partEndsAt = 0;
+  let timer = null;
+  let stimulus = null;
+  let trials = [];
+  let partSummaries = [];
+  let trialNumber = 0;
+  let acceptingResponse = false;
+  let saving = false;
+
+  function createId() {
+    if (crypto.randomUUID) return crypto.randomUUID();
+    return "p-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+  }
+
+  function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function randomDifferent(items, previous) {
+    const choices = items.filter(item => item !== previous);
+    return choices[Math.floor(Math.random() * choices.length)];
+  }
+
+  function makeStimulus() {
+    const part = PARTS[partIndex];
+    let word;
+    let ink;
+
+    if (part.type === "word-reading") {
+      word = randomDifferent(COLORS, stimulus?.word);
+      ink = "RED";
+    } else if (part.type === "blue-word") {
+      word = "BLUE";
+      ink = randomDifferent(COLORS, stimulus?.ink);
+    } else if (part.type === "congruent") {
+      const previous = stimulus?.ink;
+      ink = randomDifferent(COLORS, previous);
+      word = ink;
+    } else {
+      word = COLORS[Math.floor(Math.random() * COLORS.length)];
+      ink = randomDifferent(COLORS, stimulus?.ink);
+    }
+
+    return {
+      word,
+      ink,
+      correct: part.task === "word" ? word : ink
+    };
+  }
+
+  function showStimulus() {
+    stimulus = makeStimulus();
+    $("stimulus").textContent = stimulus.word;
+    $("stimulus").style.color = COLOR_HEX[stimulus.ink];
+    $("feedback").textContent = "";
+    acceptingResponse = true;
+    stimulus.startedAt = performance.now();
+    stimulus.startedUTC = new Date().toISOString();
+  }
+
+  function startPart() {
+    if (partIndex >= PARTS.length) {
+      finishTest();
+      return;
+    }
+
+    const part = PARTS[partIndex];
+    trialNumber = 0;
+    stimulus = null;
+    partStartedAt = Date.now();
+    partEndsAt = partStartedAt + PART_SECONDS * 1000;
+
+    $("partTitle").textContent = part.name;
+    $("instructions").textContent = part.instruction;
+    $("timeLeft").textContent = PART_SECONDS;
+    $("trialCount").textContent = "0";
+    $("progressBar").style.width = "0%";
+
+    showStimulus();
+
+    clearInterval(timer);
+    timer = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((partEndsAt - Date.now()) / 1000));
+      const elapsed = Math.min(PART_SECONDS * 1000, Date.now() - partStartedAt);
+
+      $("timeLeft").textContent = remaining;
+      $("progressBar").style.width =
+        Math.min(100, elapsed / (PART_SECONDS * 1000) * 100) + "%";
+
+      if (Date.now() >= partEndsAt) endPart();
+    }, 100);
+  }
+
+  function respond(color) {
+    if (!acceptingResponse || !stimulus || saving) return;
+
+    const now = performance.now();
+    const answeredUTC = new Date().toISOString();
+    const rt = Math.round(now - stimulus.startedAt);
+    const part = PARTS[partIndex];
+    const correct = color === stimulus.correct;
+
+    acceptingResponse = false;
+
+    trials.push({
+      participant_id: participantId,
+      session_id: sessionId || participantId,
+      participant_name: participantName || null,
+      part_number: partIndex + 1,
+      part_name: part.name,
+      trial_number: trialNumber + 1,
+      task: part.task,
+      word: stimulus.word,
+      font_color: stimulus.ink,
+      correct_answer: stimulus.correct,
+      response: color,
+      is_correct: correct,
+      reaction_time_ms: rt,
+      trial_started_at: stimulus.startedUTC,
+      answered_at: answeredUTC,
+      condition: part.type,
+      trial_number_in_part: trialNumber + 1,
+      stimulus_word: stimulus.word,
+      response_key: color[0],
+      correct: correct,
+      timestamp_utc: answeredUTC
+    });
+
+    trialNumber++;
+    $("trialCount").textContent = trialNumber;
+    $("feedback").textContent = correct ? "Correct" : "Incorrect";
+
+    if (Date.now() < partEndsAt) {
+      setTimeout(() => {
+        if (partIndex < PARTS.length && Date.now() < partEndsAt) {
+          showStimulus();
+        }
+      }, 150);
+    }
+  }
+
+  function endPart() {
+    if (partIndex >= PARTS.length) return;
+
+    clearInterval(timer);
+    acceptingResponse = false;
+
+    const currentTrials = trials.filter(t => t.part_number === partIndex + 1);
+    const correctTrials = currentTrials.filter(t => t.is_correct);
+    const rts = currentTrials
+      .filter(t => t.is_correct)
+      .map(t => t.reaction_time_ms);
+
+    partSummaries.push({
+      part_number: partIndex + 1,
+      part_name: PARTS[partIndex].name,
+      total_trials: currentTrials.length,
+      correct: correctTrials.length,
+      accuracy_percent: currentTrials.length
+        ? Math.round(correctTrials.length / currentTrials.length * 100)
+        : 0,
+      mean_correct_rt_ms: rts.length
+        ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length)
+        : null
+    });
+
+    partIndex++;
+    if (partIndex < PARTS.length) {
+      $("feedback").textContent = "Next part starting...";
+      setTimeout(startPart, 800);
+    } else {
+      finishTest();
+    }
+  }
+
+  async function setupDatabase() {
+    if (
+      SUPABASE_URL.includes("YOUR_SUPABASE") ||
+      SUPABASE_ANON_KEY.includes("YOUR_SUPABASE") ||
+      !window.supabase
+    ) {
+      return null;
+    }
+
+    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  async function startTest() {
+    $("startButton").disabled = true;
+    $("startButton").textContent = "Starting...";
+
+    participantName = $("participantName").value.trim();
+    participantId = createId();
+    sessionId = "";
+    trials = [];
+    partSummaries = [];
+    partIndex = 0;
+    saving = false;
+
+    try {
+      db = await setupDatabase();
+
+      if (db) {
+        const { data, error } = await db
+          .from("stroop_sessions")
+          .insert({
+            participant_id: participantId,
+            participant_label: participantName || null,
+            started_at: new Date().toISOString(),
+            completed: false,
+            part_seconds: PART_SECONDS,
+            app_version: "1.0"
+          })
+          .select("id")
+          .single();
+
+        if (error) throw error;
+        sessionId = String(data.id);
+      }
+
+      $("intro").classList.add("hidden");
+      $("results").classList.add("hidden");
+      $("test").classList.remove("hidden");
+      startPart();
+    } catch (error) {
+      console.error("Could not start database session:", error);
+      alert(
+        "Could not create a database session. Check your Supabase URL, " +
+        "publishable key, table columns and Row Level Security policies. " +
+        "Details: " + error.message
+      );
+      $("startButton").disabled = false;
+      $("startButton").textContent = "Start test";
+    }
+  }
+
+  async function finishTest() {
+    clearInterval(timer);
+    acceptingResponse = false;
+    if (saving) return;
+    saving = true;
+
+    $("test").classList.add("hidden");
+    $("results").classList.remove("hidden");
+    $("saveStatus").textContent = "Saving results...";
+
+    let saveMessage = "Results recorded in this browser. Database not configured.";
+
+    try {
+      if (db) {
+        // Insert trial rows in batches.
+        for (let i = 0; i < trials.length; i += 100) {
+          const batch = trials.slice(i, i + 100);
+          const { error } = await db.from("stroop_trials").insert(batch);
+          if (error) throw error;
+        }
+
+        if (sessionId) {
+          const { error } = await db
+            .from("stroop_sessions")
+            .update({
+              completed_at: new Date().toISOString(),
+              completed: true,
+              total_trials: trials.length,
+              part_summaries: partSummaries
+            })
+            .eq("id", sessionId);
+
+          if (error) throw error;
+        }
+        saveMessage = "Your results were saved to Supabase successfully.";
+      }
+    } catch (error) {
+      console.error("Saving failed:", error);
+      saveMessage = "Database saving failed: " + error.message +
+        ". You can still download your CSV results.";
+    }
+
+    $("saveStatus").textContent = saveMessage;
+
+    $("summary").innerHTML = "";
+    partSummaries.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "result";
+      div.textContent =
+        s.part_name + " — " + s.total_trials + " trials, " +
+        s.accuracy_percent + "% correct, mean correct reaction time: " +
+        (s.mean_correct_rt_ms == null ? "N/A" : s.mean_correct_rt_ms + " ms");
+      $("summary").appendChild(div);
+    });
+
+    saving = false;
+  }
+
+  function downloadCSV() {
+    const columns = [
+      "participant_id", "session_id", "participant_name",
+      "part_number", "part_name", "trial_number", "task", "word",
+      "font_color", "correct_answer", "response", "is_correct",
+      "reaction_time_ms", "trial_started_at", "answered_at"
+    ];
+
+    const quote = value => {
+      const str = value == null ? "" : String(value);
+      return '"' + str.replace(/"/g, '""') + '"';
+    };
+
+    const rows = [
+      columns.join(","),
+      ...trials.map(trial => columns.map(col => quote(trial[col])).join(","))
+    ];
+
+    const blob = new Blob(["\uFEFF" + rows.join("\r\n")], {
+      type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "stroop-results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  $("startButton").addEventListener("click", startTest);
+  $("downloadButton").addEventListener("click", downloadCSV);
+  $("restartButton").addEventListener("click", () => {
+    $("results").classList.add("hidden");
+    $("intro").classList.remove("hidden");
+    $("startButton").disabled = false;
+    $("startButton").textContent = "Start test";
+  });
+
+  document.querySelectorAll("[data-color]").forEach(button => {
+    button.addEventListener("click", () => respond(button.dataset.color));
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+    const color = KEY_TO_COLOR[event.key.toLowerCase()];
+    if (color) respond(color);
+  });
+</script>
+</body>
+</html>
