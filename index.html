@@ -355,7 +355,9 @@
   }
 
   function showStimulus() {
-    (!partActive || Date.now() >= partEndsAt) return;
+    
+if (!partActive || Date.now() >= partEndsAt) return;
+
 
     stimulus = makeStimulus();
     $("stimulus").textContent = stimulus.word;
