@@ -594,7 +594,11 @@
           .select("id")
           .single();
 
-        if (error) throw error;
+       if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
+}
 
         sessionId = String(data.id);
       }
@@ -644,7 +648,11 @@
             .from("stroop_trials")
             .insert(batch);
 
-          if (error) throw error;
+         if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
+}
         }
 
         if (sessionId) {
@@ -658,7 +666,11 @@
             })
             .eq("id", sessionId);
 
-          if (error) throw error;
+          if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
+}
         }
 
         saveMessage = "Resultaten har sparats i databasen.";
