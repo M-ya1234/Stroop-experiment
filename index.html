@@ -1,79 +1,142 @@
 
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Strooptest</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
-      margin: 0; padding: 24px 16px;
+      margin: 0;
+      padding: 24px 16px;
       font-family: Arial, sans-serif;
-      background: #f3f5f9; color: #202938;
+      background: #f3f5f9;
+      color: #202938;
     }
+
     main {
-      max-width: 700px; margin: 0 auto; background: white;
-      padding: 28px; border-radius: 18px;
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
       box-shadow: 0 5px 24px #17203312;
     }
+
     h1, h2 { text-align: center; }
     h1 { margin-top: 0; }
+
     .muted {
-      color: #657185; text-align: center; line-height: 1.6;
+      color: #657185;
+      text-align: center;
+      line-height: 1.6;
     }
-    label { display: block; margin: 18px 0 8px; font-weight: bold; }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      font-weight: bold;
+    }
+
     input {
-      width: 100%; padding: 12px; border: 1px solid #cbd2de;
-      border-radius: 8px; font-size: 16px;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd2de;
+      border-radius: 8px;
+      font-size: 16px;
     }
+
     button {
-      cursor: pointer; border: 0; border-radius: 9px;
-      padding: 13px 18px; font-size: 16px; font-weight: bold;
+      cursor: pointer;
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 18px;
+      font-size: 16px;
+      font-weight: bold;
     }
-    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .primary {
-      width: 100%; margin-top: 20px; background: #315bd6; color: white;
+      width: 100%;
+      margin-top: 20px;
+      background: #315bd6;
+      color: white;
     }
+
     .status {
-      text-align: center; background: #f0f3f8; padding: 14px;
-      border-radius: 10px; line-height: 1.7;
+      text-align: center;
+      background: #f0f3f8;
+      padding: 14px;
+      border-radius: 10px;
+      line-height: 1.7;
     }
+
     .stimulus {
-      min-height: 150px; display: flex; align-items: center;
-      justify-content: center; font-size: clamp(42px, 10vw, 68px);
-      font-weight: 900; letter-spacing: 2px; text-align: center;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(42px, 10vw, 68px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-align: center;
       margin: 18px 0;
     }
+
     .choices {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
-    .choice { color: white; min-height: 52px; }
+
+    .choice {
+      color: white;
+      min-height: 52px;
+    }
+
     .red { background: #d92535; }
     .blue { background: #2364d8; }
     .green { background: #16834b; }
     .yellow { background: #e4bd18; color: #202020; }
+
     .hidden { display: none !important; }
+
     .progress {
-      height: 9px; background: #e4e8ef; border-radius: 99px;
-      overflow: hidden; margin: 14px 0;
+      height: 9px;
+      background: #e4e8ef;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 14px 0;
     }
+
     .progress-bar {
-      height: 100%; width: 0%; background: #315bd6;
-      transition: width .2s linear;
+      height: 100%;
+      width: 0%;
+      background: #315bd6;
+      transition: width 0.2s linear;
     }
+
     .result {
-      padding: 12px; margin-top: 10px;
-      background: #f3f5f9; border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      background: #f3f5f9;
+      border-radius: 8px;
     }
+
     .small { font-size: 13px; }
-    @media (max-width: 480px) {
-      main { padding: 20px 16px; }
-    }
   </style>
 </head>
+
 <body>
 <main>
   <h1>Strooptest</h1>
@@ -86,16 +149,24 @@
       som möjligt. Läs instruktionerna inför varje del noggrant.
     </p>
 
-    <label for="participantName">Deltagarkod (valfritt)</label>
-    <input id="participantName" maxlength="80"
-      placeholder="Använd ett smeknamn eller en anonym kod">
+    <label for="participantName">
+      Deltagarkod (valfritt)
+    </label>
+
+    <input
+      id="participantName"
+      maxlength="80"
+      placeholder="Använd ett smeknamn eller en anonym kod"
+    >
 
     <p class="muted small">
-      Dina svar och reaktionstider sparas i databasen om den
-      är konfigurerad. Annars kan testet köras utan databassparning.
+      Dina svar och reaktionstider sparas i studiens databas
+      om databasen är korrekt konfigurerad.
     </p>
 
-    <button class="primary" id="startButton">Börja testet</button>
+    <button class="primary" id="startButton">
+      Börja testet
+    </button>
   </section>
 
   <section id="instructionScreen" class="hidden">
@@ -104,7 +175,9 @@
     <p class="muted small">
       Nästa del startar inte förrän du trycker på knappen nedan.
     </p>
-    <button class="primary" id="beginPartButton">Börja delen</button>
+    <button class="primary" id="beginPartButton">
+      Börja delen
+    </button>
   </section>
 
   <section id="test" class="hidden">
@@ -120,7 +193,9 @@
       <div id="progressBar" class="progress-bar"></div>
     </div>
 
-    <div id="stimulus" class="stimulus" aria-live="polite">REDO</div>
+    <div id="stimulus" class="stimulus" aria-live="polite">
+      REDO
+    </div>
 
     <div class="choices">
       <button class="choice red" data-color="RED">RÖD (R)</button>
@@ -133,430 +208,556 @@
       Tryck på en färgknapp eller använd tangentbordet:
       R = röd, B = blå, G = grön och Y = gul.
     </p>
+
     <p id="feedback" class="muted" aria-live="polite"></p>
   </section>
 
   <section id="results" class="hidden">
     <h2>Testet är klart!</h2>
-    <p class="muted" id="saveStatus"></p>
+    <p class="muted" id="saveStatus">Sparar resultaten...</p>
     <div id="summary"></div>
-    <button class="primary" id="restartButton">Starta ett nytt test</button>
+
+    <button class="primary" id="restartButton">
+      Starta ett nytt test
+    </button>
   </section>
 </main>
 
 <script>
-"use strict";
+  // Ersätt med uppgifterna från ditt Supabase-projekt.
+  const SUPABASE_URL = "https://nrgdowdzzrlkxgjsfadp.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-";
 
-// Lägg in din riktiga Supabase-URL och anon/publishable key här.
-const SUPABASE_URL = "https://nrgdowdzzrlkxgjsfadp.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-";
+  const COLORS = ["RED", "BLUE", "GREEN", "YELLOW"];
 
-const COLORS = ["RED", "BLUE", "GREEN", "YELLOW"];
-const COLOR_HEX = {
-  RED: "#d92535",
-  BLUE: "#2364d8",
-  GREEN: "#16834b",
-  YELLOW: "#d4ad08"
-};
-const KEY_TO_COLOR = { r: "RED", b: "BLUE", g: "GREEN", y: "YELLOW" };
-const PART_SECONDS = 60;
-
-const PARTS = [
-  {
-    name: "Del 1 – Läs ordet",
-    instruction: "Läs ordet som visas och välj knappen som motsvarar ordet. Ignorera textens färg. Texten visas alltid i rött, men ordet ändras.",
-    task: "word", type: "word-reading"
-  },
-  {
-    name: "Del 2 – Ordet BLÅ",
-    instruction: "Ordet BLÅ visas, men textens färg ändras. Välj färgen som texten faktiskt har och ignorera ordets betydelse. Om BLÅ visas med röd text väljer du RÖD.",
-    task: "ink", type: "blue-word"
-  },
-  {
-    name: "Del 3 – Samma ord och färg",
-    instruction: "Välj textens färg. Ordet och textens färg stämmer överens.",
-    task: "ink", type: "congruent"
-  },
-  {
-    name: "Del 4 – Olika ord och färg",
-    instruction: "Välj textens faktiska färg, inte färgen som ordet beskriver. Om RÖD visas med blå text väljer du BLÅ.",
-    task: "ink", type: "incongruent"
-  },
-  {
-    name: "Del 5 – Övning med samma färg",
-    instruction: "Välj textens färg. Ordet och textens färg stämmer överens. Svara så snabbt och korrekt som möjligt.",
-    task: "ink", type: "congruent"
-  },
-  {
-    name: "Del 6 – Övning med olika färger",
-    instruction: "Välj textens faktiska färg och ignorera ordets betydelse. Svara så snabbt och korrekt som möjligt.",
-    task: "ink", type: "incongruent"
-  }
-];
-
-const $ = id => document.getElementById(id);
-
-let db = null;
-let participantId = "";
-let sessionId = "";
-let participantName = "";
-let partIndex = 0;
-let partStartedAt = 0;
-let partEndsAt = 0;
-let timer = null;
-let stimulus = null;
-let trials = [];
-let partSummaries = [];
-let trialNumber = 0;
-let acceptingResponse = false;
-let saving = false;
-let partActive = false;
-
-function createId() {
-  return crypto.randomUUID
-    ? crypto.randomUUID()
-    : "p-" + Date.now() + "-" + Math.random().toString(36).slice(2);
-}
-
-function randomDifferent(items, previous) {
-  const choices = items.filter(item => item !== previous);
-  return choices[Math.floor(Math.random() * choices.length)];
-}
-
-function makeStimulus() {
-  const part = PARTS[partIndex];
-  let word;
-  let ink;
-
-  if (part.type === "word-reading") {
-    word = randomDifferent(COLORS, stimulus?.word);
-    ink = "RED";
-  } else if (part.type === "blue-word") {
-    word = "BLUE";
-    ink = randomDifferent(COLORS, stimulus?.ink);
-  } else if (part.type === "congruent") {
-    ink = randomDifferent(COLORS, stimulus?.ink);
-    word = ink;
-  } else {
-    word = COLORS[Math.floor(Math.random() * COLORS.length)];
-    ink = randomDifferent(COLORS, stimulus?.ink);
-  }
-
-  return {
-    word,
-    ink,
-    correct: part.task === "word" ? word : ink
+  const COLOR_HEX = {
+    RED: "#d92535",
+    BLUE: "#2364d8",
+    GREEN: "#16834b",
+    YELLOW: "#d4ad08"
   };
-}
 
-function showStimulus() {
-  if (!partActive || Date.now() >= partEndsAt) return;
+  const KEY_TO_COLOR = {
+    r: "RED",
+    b: "BLUE",
+    g: "GREEN",
+    y: "YELLOW"
+  };
 
-  stimulus = makeStimulus();
-  $("stimulus").textContent = stimulus.word;
-  $("stimulus").style.color = COLOR_HEX[stimulus.ink];
-  $("feedback").textContent = "";
-  acceptingResponse = true;
-  stimulus.startedAt = performance.now();
-  stimulus.startedUTC = new Date().toISOString();
-}
+  const PART_SECONDS = 60;
 
-function showPartInstructions() {
-  if (partIndex >= PARTS.length) {
-    finishTest();
-    return;
+  const PARTS = [
+    {
+      name: "Del 1 – Läs ordet",
+      instruction:
+        "Läs ordet som visas och välj knappen som motsvarar ordet. " +
+        "Ignorera textens färg. Texten visas alltid i rött, " +
+        "men ordet ändras.",
+      task: "word",
+      type: "word-reading"
+    },
+    {
+      name: "Del 2 – Ordet BLÅ",
+      instruction:
+        "Ordet BLÅ visas, men textens färg ändras. " +
+        "Välj färgen som texten faktiskt har och ignorera ordets betydelse. " +
+        "Exempel: Om BLÅ visas med röd text väljer du RÖD.",
+      task: "ink",
+      type: "blue-word"
+    },
+    {
+      name: "Del 3 – Samma ord och färg",
+      instruction:
+        "Välj textens färg. Ordet och textens färg stämmer överens.",
+      task: "ink",
+      type: "congruent"
+    },
+    {
+      name: "Del 4 – Olika ord och färg",
+      instruction:
+        "Välj textens faktiska färg, inte färgen som ordet beskriver. " +
+        "Exempel: Om RÖD visas med blå text väljer du BLÅ.",
+      task: "ink",
+      type: "incongruent"
+    },
+    {
+      name: "Del 5 – Övning med samma färg",
+      instruction:
+        "Välj textens färg. Ordet och textens färg stämmer överens. " +
+        "Svara så snabbt och korrekt som möjligt.",
+      task: "ink",
+      type: "congruent"
+    },
+    {
+      name: "Del 6 – Övning med olika färger",
+      instruction:
+        "Välj textens faktiska färg och ignorera ordets betydelse. " +
+        "Svara så snabbt och korrekt som möjligt.",
+      task: "ink",
+      type: "incongruent"
+    }
+  ];
+
+  const $ = id => document.getElementById(id);
+
+  let db = null;
+  let participantId = "";
+  let sessionId = "";
+  let participantName = "";
+  let partIndex = 0;
+  let partStartedAt = 0;
+  let partEndsAt = 0;
+  let timer = null;
+  let stimulus = null;
+  let trials = [];
+  let partSummaries = [];
+  let trialNumber = 0;
+  let acceptingResponse = false;
+  let saving = false;
+  let partActive = false;
+
+  function createId() {
+    if (crypto.randomUUID) return crypto.randomUUID();
+
+    return "p-" + Date.now() + "-" +
+      Math.random().toString(36).slice(2);
   }
 
-  partActive = false;
-  acceptingResponse = false;
-  clearInterval(timer);
-
-  const part = PARTS[partIndex];
-  $("test").classList.add("hidden");
-  $("instructionScreen").classList.remove("hidden");
-  $("instructionTitle").textContent = part.name;
-  $("instructionText").textContent = part.instruction;
-  $("beginPartButton").textContent = "Börja delen";
-}
-
-function startPart() {
-  if (partIndex >= PARTS.length) {
-    finishTest();
-    return;
+  function randomDifferent(items, previous) {
+    const choices = items.filter(item => item !== previous);
+    return choices[Math.floor(Math.random() * choices.length)];
   }
 
-  clearInterval(timer);
-  const part = PARTS[partIndex];
-  trialNumber = 0;
-  stimulus = null;
+  function makeStimulus() {
+    const part = PARTS[partIndex];
+    let word;
+    let ink;
 
-  $("instructionScreen").classList.add("hidden");
-  $("test").classList.remove("hidden");
-  $("partTitle").textContent = part.name;
-  $("instructions").textContent = part.instruction;
-  $("timeLeft").textContent = PART_SECONDS;
-  $("trialCount").textContent = "0";
-  $("progressBar").style.width = "0%";
-  $("feedback").textContent = "";
+    if (part.type === "word-reading") {
+      word = randomDifferent(COLORS, stimulus?.word);
+      ink = "RED";
+    } else if (part.type === "blue-word") {
+      word = "BLUE";
+      ink = randomDifferent(COLORS, stimulus?.ink);
+    } else if (part.type === "congruent") {
+      ink = randomDifferent(COLORS, stimulus?.ink);
+      word = ink;
+    } else {
+      word = COLORS[Math.floor(Math.random() * COLORS.length)];
+      ink = randomDifferent(COLORS, stimulus?.ink);
+    }
 
-  partStartedAt = Date.now();
-  partEndsAt = partStartedAt + PART_SECONDS * 1000;
-  partActive = true;
-  showStimulus();
+    return {
+      word,
+      ink,
+      correct: part.task === "word" ? word : ink
+    };
+  }
 
-  timer = setInterval(() => {
+  function showStimulus() {
+    if (!partActive || Date.now() >= partEndsAt) return;
+
+    stimulus = makeStimulus();
+    $("stimulus").textContent = stimulus.word;
+    $("stimulus").style.color = COLOR_HEX[stimulus.ink];
+    $("feedback").textContent = "";
+
+    acceptingResponse = true;
+    stimulus.startedAt = performance.now();
+    stimulus.startedUTC = new Date().toISOString();
+  }
+
+  function showPartInstructions() {
+    if (partIndex >= PARTS.length) {
+      finishTest();
+      return;
+    }
+
+    const part = PARTS[partIndex];
+
+    partActive = false;
+    acceptingResponse = false;
+    clearInterval(timer);
+
+    $("test").classList.add("hidden");
+    $("instructionScreen").classList.remove("hidden");
+
+    $("instructionTitle").textContent = part.name;
+    $("instructionText").textContent = part.instruction;
+    $("beginPartButton").textContent = "Börja delen";
+  }
+
+  function startPart() {
+    if (partIndex >= PARTS.length) {
+      finishTest();
+      return;
+    }
+
+    clearInterval(timer);
+
+    const part = PARTS[partIndex];
+
+    trialNumber = 0;
+    stimulus = null;
+
+    $("instructionScreen").classList.add("hidden");
+    $("test").classList.remove("hidden");
+
+    $("partTitle").textContent = part.name;
+    $("instructions").textContent = part.instruction;
+    $("timeLeft").textContent = PART_SECONDS;
+    $("trialCount").textContent = "0";
+    $("progressBar").style.width = "0%";
+    $("feedback").textContent = "";
+
+    // Timern börjar först när deltagaren trycker på Börja delen.
+    partStartedAt = Date.now();
+    partEndsAt = partStartedAt + PART_SECONDS * 1000;
+    partActive = true;
+
+    showStimulus();
+
+    timer = setInterval(() => {
+      if (!partActive) return;
+
+      const now = Date.now();
+      const remaining = Math.max(
+        0,
+        Math.ceil((partEndsAt - now) / 1000)
+      );
+
+      const elapsed = Math.min(
+        PART_SECONDS * 1000,
+        now - partStartedAt
+      );
+
+      $("timeLeft").textContent = remaining;
+      $("progressBar").style.width =
+        Math.min(100, elapsed / (PART_SECONDS * 1000) * 100) + "%";
+
+      if (now >= partEndsAt) {
+        endPart();
+      }
+    }, 100);
+  }
+
+  function respond(color) {
+    if (
+      !acceptingResponse ||
+      !stimulus ||
+      saving ||
+      !partActive
+    ) {
+      return;
+    }
+
+    if (Date.now() >= partEndsAt) {
+      endPart();
+      return;
+    }
+
+    const now = performance.now();
+    const answeredUTC = new Date().toISOString();
+    const rt = Math.round(now - stimulus.startedAt);
+    const part = PARTS[partIndex];
+    const correct = color === stimulus.correct;
+    const currentPartNumber = partIndex + 1;
+    const currentTrialNumber = trialNumber + 1;
+
+    acceptingResponse = false;
+
+    trials.push({
+      participant_id: participantId,
+      session_id: sessionId || participantId,
+      participant_name: participantName || null,
+      part_number: currentPartNumber,
+      part_name: part.name,
+      trial_number: currentTrialNumber,
+      task: part.task,
+      word: stimulus.word,
+      font_color: stimulus.ink,
+      correct_answer: stimulus.correct,
+      response: color,
+      is_correct: correct,
+      reaction_time_ms: rt,
+      trial_started_at: stimulus.startedUTC,
+      answered_at: answeredUTC,
+      condition: part.type,
+      trial_number_in_part: currentTrialNumber,
+      stimulus_word: stimulus.word,
+      response_key: color[0],
+      correct: correct,
+      timestamp_utc: answeredUTC
+    });
+
+    trialNumber++;
+    $("trialCount").textContent = trialNumber;
+    $("feedback").textContent = correct ? "Rätt svar!" : "Fel svar";
+
+    setTimeout(() => {
+      if (
+        partActive &&
+        Date.now() < partEndsAt &&
+        !acceptingResponse
+      ) {
+        showStimulus();
+      }
+    }, 150);
+  }
+
+  function endPart() {
     if (!partActive) return;
 
-    const now = Date.now();
-    const remaining = Math.max(0, Math.ceil((partEndsAt - now) / 1000));
-    const elapsed = Math.min(PART_SECONDS * 1000, now - partStartedAt);
+    partActive = false;
+    acceptingResponse = false;
+    clearInterval(timer);
 
-    $("timeLeft").textContent = remaining;
-    $("progressBar").style.width =
-      Math.min(100, elapsed / (PART_SECONDS * 1000) * 100) + "%";
+    const currentPartNumber = partIndex + 1;
+    const currentTrials = trials.filter(
+      t => t.part_number === currentPartNumber
+    );
 
-    if (now >= partEndsAt) endPart();
-  }, 100);
+    const correctTrials = currentTrials.filter(t => t.is_correct);
+
+    const rts = correctTrials.map(t => t.reaction_time_ms);
+
+    partSummaries.push({
+      part_number: currentPartNumber,
+      part_name: PARTS[partIndex].name,
+      total_trials: currentTrials.length,
+      correct: correctTrials.length,
+      accuracy_percent: currentTrials.length
+        ? Math.round(
+            correctTrials.length / currentTrials.length * 100
+          )
+        : 0,
+      mean_correct_rt_ms: rts.length
+        ? Math.round(
+            rts.reduce((a, b) => a + b, 0) / rts.length
+          )
+        : null
+    });
+
+    partIndex++;
+
+    if (partIndex < PARTS.length) {
+      showPartInstructions();
+    } else {
+      finishTest();
+    }
+  }
+
+ 
+async function setupDatabase() {
+  if (
+    SUPABASE_URL === "https://nrgdowdzzrlkxgjsfadp.supabase.co" ||
+    SUPABASE_ANON_KEY === "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-" ||
+    !window.supabase
+  ) {
+    throw new Error(
+      "Supabase is not configured. Check the URL and API key."
+    );
+  }
+
+  return window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 }
 
-function respond(color) {
-  if (!acceptingResponse || !stimulus || saving || !partActive) return;
 
-  if (Date.now() >= partEndsAt) {
-    endPart();
+  async function startTest() {
+    $("startButton").disabled = true;
+    $("startButton").textContent = "Startar...";
+
+    participantName = $("participantName").value.trim();
+    participantId = createId();
+    sessionId = "";
+    trials = [];
+    partSummaries = [];
+    partIndex = 0;
+    saving = false;
+    partActive = false;
+    acceptingResponse = false;
+    clearInterval(timer);
+
+    try {
+      db = await setupDatabase();
+
+     
+if (db) {
+  const { error } = await db
+    .from("stroop_sessions")
+    .insert({
+      id: participantId,
+      participant_id: participantId,
+      participant_label: participantName || null,
+      started_at: new Date().toISOString(),
+      completed: false,
+      part_seconds: PART_SECONDS,
+      app_version: "1.1"
+    });
+
+  if (error) {
+    console.error("Could not save session:", error);
+    alert("Could not save session: " + error.message);
     return;
   }
 
-  const now = performance.now();
-  const answeredUTC = new Date().toISOString();
-  const rt = Math.round(now - stimulus.startedAt);
-  const part = PARTS[partIndex];
-  const correct = color === stimulus.correct;
-  const partNumber = partIndex + 1;
-  const currentTrialNumber = trialNumber + 1;
+  sessionId = participantId;
+}
 
-  acceptingResponse = false;
 
-  trials.push({
-    participant_id: participantId,
-    session_id: sessionId || participantId,
-    participant_name: participantName || null,
-    part_number: partNumber,
-    part_name: part.name,
-    trial_number: currentTrialNumber,
-    task: part.task,
-    word: stimulus.word,
-    font_color: stimulus.ink,
-    correct_answer: stimulus.correct,
-    response: color,
-    is_correct: correct,
-    reaction_time_ms: rt,
-    trial_started_at: stimulus.startedUTC,
-    answered_at: answeredUTC,
-    condition: part.type,
-    trial_number_in_part: currentTrialNumber,
-    stimulus_word: stimulus.word,
-    response_key: color[0],
-    correct: correct,
-    timestamp_utc: answeredUTC
-  });
+       if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
+}
 
-  trialNumber++;
-  $("trialCount").textContent = trialNumber;
-  $("feedback").textContent = correct ? "Rätt svar!" : "Fel svar";
+        sessionId = String(data.id);
+      }
 
-  setTimeout(() => {
-    if (partActive && Date.now() < partEndsAt && !acceptingResponse) {
-      showStimulus();
+      $("intro").classList.add("hidden");
+      $("results").classList.add("hidden");
+
+      showPartInstructions();
+    } catch (error) {
+      console.error("Kunde inte starta databassessionen:", error);
+
+      alert(
+        "Det gick inte att skapa en session i databasen. " +
+        "Kontrollera Supabase-adressen, nyckeln, tabellkolumnerna " +
+        "och säkerhetspolicyerna (Row Level Security). " +
+        "Detaljer: " + error.message
+      );
+
+      $("startButton").disabled = false;
+      $("startButton").textContent = "Börja testet";
     }
-  }, 150);
-}
-
-function endPart() {
-  if (!partActive) return;
-
-  partActive = false;
-  acceptingResponse = false;
-  clearInterval(timer);
-
-  const partNumber = partIndex + 1;
-  const currentTrials = trials.filter(t => t.part_number === partNumber);
-  const correctTrials = currentTrials.filter(t => t.is_correct);
-  const rts = correctTrials.map(t => t.reaction_time_ms);
-
-  partSummaries.push({
-    part_number: partNumber,
-    part_name: PARTS[partIndex].name,
-    total_trials: currentTrials.length,
-    correct: correctTrials.length,
-    accuracy_percent: currentTrials.length
-      ? Math.round(correctTrials.length / currentTrials.length * 100)
-      : 0,
-    mean_correct_rt_ms: rts.length
-      ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length)
-      : null
-  });
-
-  partIndex++;
-  if (partIndex < PARTS.length) showPartInstructions();
-  else finishTest();
-}
-
-async function setupDatabase() {
-  const notConfigured =
-    !SUPABASE_URL.startsWith("https://") ||
-    SUPABASE_URL.includes("PASTE_YOUR_") ||
-    SUPABASE_ANON_KEY.includes("PASTE_YOUR_") ||
-    !SUPABASE_ANON_KEY;
-
-  if (notConfigured) return null;
-
-  if (!window.supabase) {
-    throw new Error("Supabase-biblioteket kunde inte laddas. Kontrollera internetanslutningen.");
   }
 
-  return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  async function finishTest() {
+    clearInterval(timer);
+    partActive = false;
+    acceptingResponse = false;
+
+    if (saving) return;
+    saving = true;
+
+    $("instructionScreen").classList.add("hidden");
+    $("test").classList.add("hidden");
+    $("results").classList.remove("hidden");
+    $("saveStatus").textContent = "Sparar resultaten...";
+
+    let saveMessage =
+      "Resultaten finns bara i den här webbläsarsessionen. " +
+      "Databasen är inte konfigurerad.";
+
+    try {
+      if (db) {
+        for (let i = 0; i < trials.length; i += 100) {
+          const batch = trials.slice(i, i + 100);
+
+          const { error } = await db
+            .from("stroop_trials")
+            .insert(batch);
+
+         if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
 }
+        }
 
-async function startTest() {
-  const startButton = $("startButton");
-  startButton.disabled = true;
-  startButton.textContent = "Startar...";
+        if (sessionId) {
+          const { error } = await db
+            .from("stroop_sessions")
+            .update({
+              completed_at: new Date().toISOString(),
+              completed: true,
+              total_trials: trials.length,
+              part_summaries: partSummaries
+            })
+            .eq("id", sessionId);
 
-  participantName = $("participantName").value.trim();
-  participantId = createId();
-  sessionId = "";
-  trials = [];
-  partSummaries = [];
-  partIndex = 0;
-  saving = false;
-  partActive = false;
-  acceptingResponse = false;
-  clearInterval(timer);
+          if (error) {
+  console.error("Failed to save Stroop session:", error);
+  alert("Could not save session: " + error.message);
+  return;
+}
+        }
 
-  try {
-    db = await setupDatabase();
+        saveMessage = "Resultaten har sparats i databasen.";
+      }
+    } catch (error) {
+      console.error("Kunde inte spara resultaten:", error);
 
-    if (db) {
-      const { error } = await db.from("stroop_sessions").insert({
-        id: participantId,
-        participant_id: participantId,
-        participant_label: participantName || null,
-        started_at: new Date().toISOString(),
-        completed: false,
-        part_seconds: PART_SECONDS,
-        app_version: "1.1"
-      });
-
-      if (error) throw error;
-      sessionId = participantId;
-    } else {
-      console.warn("Supabase är inte konfigurerat. Testet körs utan databassparning.");
+      saveMessage =
+        "Det gick inte att spara resultaten i databasen. " +
+        "Kontakta försöksledaren och försök inte stänga sidan " +
+        "innan felet har rapporterats.";
     }
 
-    $("intro").classList.add("hidden");
+    $("saveStatus").textContent = saveMessage;
+    $("summary").innerHTML = "";
+
+    partSummaries.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "result";
+
+      div.textContent =
+        s.part_name + " – " +
+        s.total_trials + " försök, " +
+        s.accuracy_percent + " % rätt, " +
+        "genomsnittlig reaktionstid för rätt svar: " +
+        (s.mean_correct_rt_ms == null
+          ? "saknas"
+          : s.mean_correct_rt_ms + " ms");
+
+      $("summary").appendChild(div);
+    });
+
+    saving = false;
+  }
+
+  $("startButton").addEventListener("click", startTest);
+
+  $("beginPartButton").addEventListener("click", startPart);
+
+  $("restartButton").addEventListener("click", () => {
+    clearInterval(timer);
+    partActive = false;
+    acceptingResponse = false;
+
     $("results").classList.add("hidden");
-    showPartInstructions();
-  } catch (error) {
-    console.error("Kunde inte starta databassessionen:", error);
-    alert(
-      "Kunde inte skapa en databassession.\n\n" +
-      error.message +
-      "\n\nKontrollera Supabase-nycklar, tabellkolumner och RLS-policyer."
-    );
-    startButton.disabled = false;
-    startButton.textContent = "Börja testet";
-  }
-}
+    $("test").classList.add("hidden");
+    $("instructionScreen").classList.add("hidden");
+    $("intro").classList.remove("hidden");
 
-async function finishTest() {
-  clearInterval(timer);
-  partActive = false;
-  acceptingResponse = false;
-  if (saving) return;
-  saving = true;
-
-  $("instructionScreen").classList.add("hidden");
-  $("test").classList.add("hidden");
-  $("results").classList.remove("hidden");
-  $("saveStatus").textContent = "Förbereder resultaten...";
-
-  let saveMessage = "Resultaten sparades inte i en databas.";
-
-  try {
-    if (db) {
-      for (let i = 0; i < trials.length; i += 100) {
-        const batch = trials.slice(i, i + 100);
-        const { error } = await db.from("stroop_trials").insert(batch);
-        if (error) throw error;
-      }
-
-      if (sessionId) {
-        const { error } = await db
-          .from("stroop_sessions")
-          .update({
-            completed_at: new Date().toISOString(),
-            completed: true,
-            total_trials: trials.length,
-            part_summaries: partSummaries
-          })
-          .eq("id", sessionId);
-
-        if (error) throw error;
-      }
-
-      saveMessage = "Resultaten har sparats i databasen.";
-    } else {
-      saveMessage = "Testet kördes utan Supabase. Resultaten finns bara tillfälligt i den här sidan.";
-    }
-  } catch (error) {
-    console.error("Kunde inte spara resultaten:", error);
-    saveMessage = "Det gick inte att spara i databasen: " + error.message;
-  }
-
-  $("saveStatus").textContent = saveMessage;
-  $("summary").innerHTML = "";
-
-  partSummaries.forEach(s => {
-    const div = document.createElement("div");
-    div.className = "result";
-    div.textContent =
-      s.part_name + " – " + s.total_trials + " försök, " +
-      s.accuracy_percent + " % rätt, genomsnittlig reaktionstid för rätt svar: " +
-      (s.mean_correct_rt_ms == null ? "saknas" : s.mean_correct_rt_ms + " ms");
-    $("summary").appendChild(div);
+    $("startButton").disabled = false;
+    $("startButton").textContent = "Börja testet";
   });
 
-  saving = false;
-}
+  document.querySelectorAll("[data-color]").forEach(button => {
+    button.addEventListener("click", () => {
+      respond(button.dataset.color);
+    });
+  });
 
-$("startButton").addEventListener("click", startTest);
-$("beginPartButton").addEventListener("click", startPart);
+  document.addEventListener("keydown", event => {
+    if (
+      event.repeat ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
+      return;
+    }
 
-$("restartButton").addEventListener("click", () => {
-  clearInterval(timer);
-  partActive = false;
-  acceptingResponse = false;
-  saving = false;
-  db = null;
+    const color = KEY_TO_COLOR[event.key.toLowerCase()];
 
-  $("results").classList.add("hidden");
-  $("test").classList.add("hidden");
-  $("instructionScreen").classList.add("hidden");
-  $("intro").classList.remove("hidden");
-  $("startButton").disabled = false;
-  $("startButton").textContent = "Börja testet";
-});
-
-document.querySelectorAll("[data-color]").forEach(button => {
-  button.addEventListener("click", () => respond(button.dataset.color));
-});
-
-document.addEventListener("keydown", event => {
-  if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
-  const color = KEY_TO_COLOR[event.key.toLowerCase()];
-  if (color) respond(color);
-});
+    if (color) respond(color);
+  });
 </script>
 </body>
 </html>
