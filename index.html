@@ -584,19 +584,29 @@ async function setupDatabase() {
     try {
       db = await setupDatabase();
 
-      if (db) {
-        const { data, error } = await db
-          .from("stroop_sessions")
-          .insert({
-            participant_id: participantId,
-            participant_label: participantName || null,
-            started_at: new Date().toISOString(),
-            completed: false,
-            part_seconds: PART_SECONDS,
-            app_version: "1.1"
-          })
-          .select("id")
-          .single();
+     
+if (db) {
+  const { error } = await db
+    .from("stroop_sessions")
+    .insert({
+      id: participantId,
+      participant_id: participantId,
+      participant_label: participantName || null,
+      started_at: new Date().toISOString(),
+      completed: false,
+      part_seconds: PART_SECONDS,
+      app_version: "1.1"
+    });
+
+  if (error) {
+    console.error("Could not save session:", error);
+    alert("Could not save session: " + error.message);
+    return;
+  }
+
+  sessionId = participantId;
+}
+
 
        if (error) {
   console.error("Failed to save Stroop session:", error);
