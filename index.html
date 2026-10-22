@@ -355,7 +355,7 @@
   }
 
   function showStimulus() {
-    if (!partActive || Date.now() >= partEndsAt) return;
+    (!partActive || Date.now() >= partEndsAt) return;
 
     stimulus = makeStimulus();
     $("stimulus").textContent = stimulus.word;
@@ -585,6 +585,7 @@ async function setupDatabase() {
       db = await setupDatabase();
 
      
+
 if (db) {
   const { error } = await db
     .from("stroop_sessions")
@@ -601,21 +602,12 @@ if (db) {
   if (error) {
     console.error("Could not save session:", error);
     alert("Could not save session: " + error.message);
+    $("startButton").disabled = false;
     return;
   }
 
   sessionId = participantId;
 }
-
-
-       if (error) {
-  console.error("Failed to save Stroop session:", error);
-  alert("Could not save session: " + error.message);
-  return;
-}
-
-        sessionId = String(data.id);
-      }
 
       $("intro").classList.add("hidden");
       $("results").classList.add("hidden");
