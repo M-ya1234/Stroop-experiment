@@ -354,9 +354,8 @@
     };
   }
 
-  function showStimulus() {
-    
-if (!partActive || Date.now() >= partEndsAt) return;
+ function showStimulus() {
+    if (!partActive || Date.now() >= partEndsAt) return;
 
 
     stimulus = makeStimulus();
