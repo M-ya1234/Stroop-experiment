@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -225,6 +223,7 @@
 
 <script>
   // Ersätt med uppgifterna från ditt Supabase-projekt.
+  const SUPABASE_URL = "https://nrgdowdzzrlkxgjsfadp.supabase.coL";
   const SUPABASE_URL = "https://nrgdowdzzrlkxgjsfadp.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-";
 
@@ -547,30 +546,25 @@
     }
   }
 
- 
-async function setupDatabase() {
-  if (
-    SUPABASE_URL === "https://nrgdowdzzrlkxgjsfadp.supabase.co" ||
-    SUPABASE_ANON_KEY === "sb_publishable_xvprg08LtBkMa4QqztVsVw_gseB2pc-" ||
-    !window.supabase
-  ) {
-    throw new Error(
-      "Supabase is not configured. Check the URL and API key."
+  async function setupDatabase() {
+    if (
+      SUPABASE_URL.includes("YOUR_SUPABASE") ||
+      SUPABASE_ANON_KEY.includes("YOUR_SUPABASE") ||
+      !window.supabase
+    ) {
+      return null;
+    }
+
+    return window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
     );
   }
 
-  return window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-}
+  async function startTest() {
+    $("startButton").disabled = true;
+    $("startButton").textContent = "Startar...";
 
-
-async function startTest() {
-  $("startButton").disabled = true;
-  $("startButton").textContent = "Startar...";
-
-  try {
     participantName = $("participantName").value.trim();
     participantId = createId();
     sessionId = "";
@@ -582,51 +576,46 @@ async function startTest() {
     acceptingResponse = false;
     clearInterval(timer);
 
-    db = await setupDatabase();
+    try {
+      db = await setupDatabase();
 
-    if (db) {
-      const { error } = await db
-        .from("stroop_sessions")
-        .insert({
-          id: participantId,
-          participant_id: participantId,
-          participant_label: participantName || null,
-          started_at: new Date().toISOString(),
-          completed: false,
-          part_seconds: PART_SECONDS,
-          app_version: "1.1"
-        });
+      if (db) {
+        const { data, error } = await db
+          .from("stroop_sessions")
+          .insert({
+            participant_id: participantId,
+            participant_label: participantName || null,
+            started_at: new Date().toISOString(),
+            completed: false,
+            part_seconds: PART_SECONDS,
+            app_version: "1.1"
+          })
+          .select("id")
+          .single();
 
-      if (error) {
-        throw error;
+        if (error) throw error;
+
+        sessionId = String(data.id);
       }
 
-      sessionId = participantId;
+      $("intro").classList.add("hidden");
+      $("results").classList.add("hidden");
+
+      showPartInstructions();
+    } catch (error) {
+      console.error("Kunde inte starta databassessionen:", error);
+
+      alert(
+        "Det gick inte att skapa en session i databasen. " +
+        "Kontrollera Supabase-adressen, nyckeln, tabellkolumnerna " +
+        "och säkerhetspolicyerna (Row Level Security). " +
+        "Detaljer: " + error.message
+      );
+
+      $("startButton").disabled = false;
+      $("startButton").textContent = "Börja testet";
     }
-
-    $("intro").classList.add("hidden");
-    $("results").classList.add("hidden");
-
-    showPartInstructions();
-
-  } catch (error) {
-    console.error(
-      "Kunde inte starta databassessionen:",
-      error
-    );
-
-    alert(
-      "Det gick inte att starta testet. " +
-      "Kontrollera databasen och säkerhetspolicyerna. " +
-      "Detaljer: " + (error.message || String(error))
-    );
-
-  } finally {
-    $("startButton").disabled = false;
-    $("startButton").textContent = "Börja testet";
   }
-}
-
 
   async function finishTest() {
     clearInterval(timer);
@@ -654,11 +643,7 @@ async function startTest() {
             .from("stroop_trials")
             .insert(batch);
 
-         if (error) {
-  console.error("Failed to save Stroop session:", error);
-  alert("Could not save session: " + error.message);
-  return;
-}
+          if (error) throw error;
         }
 
         if (sessionId) {
@@ -672,11 +657,7 @@ async function startTest() {
             })
             .eq("id", sessionId);
 
-          if (error) {
-  console.error("Failed to save Stroop session:", error);
-  alert("Could not save session: " + error.message);
-  return;
-}
+          if (error) throw error;
         }
 
         saveMessage = "Resultaten har sparats i databasen.";
