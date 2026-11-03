@@ -566,10 +566,11 @@ async function setupDatabase() {
 }
 
 
-  async function startTest() {
-    $("startButton").disabled = true;
-    $("startButton").textContent = "Startar...";
+async function startTest() {
+  $("startButton").disabled = true;
+  $("startButton").textContent = "Startar...";
 
+  try {
     participantName = $("participantName").value.trim();
     participantId = createId();
     sessionId = "";
@@ -581,60 +582,51 @@ async function setupDatabase() {
     acceptingResponse = false;
     clearInterval(timer);
 
-    try {
-      db = await setupDatabase();
+    db = await setupDatabase();
 
-     
-if (db) {
-  const { error } = await db
-    .from("stroop_sessions")
-    .insert({
-      id: participantId,
-      participant_id: participantId,
-      participant_label: participantName || null,
-      started_at: new Date().toISOString(),
-      completed: false,
-      part_seconds: PART_SECONDS,
-      app_version: "1.1"
-    });
+    if (db) {
+      const { error } = await db
+        .from("stroop_sessions")
+        .insert({
+          id: participantId,
+          participant_id: participantId,
+          participant_label: participantName || null,
+          started_at: new Date().toISOString(),
+          completed: false,
+          part_seconds: PART_SECONDS,
+          app_version: "1.1"
+        });
 
-  if (error) {
-    console.error("Could not save session:", error);
-    alert("Could not save session: " + error.message);
-    return;
-  }
-
-  sessionId = participantId;
-}
-
-
-       if (error) {
-  console.error("Failed to save Stroop session:", error);
-  alert("Could not save session: " + error.message);
-  return;
-}
-
-        sessionId = String(data.id);
+      if (error) {
+        throw error;
       }
 
-      $("intro").classList.add("hidden");
-      $("results").classList.add("hidden");
-
-      showPartInstructions();
-    } catch (error) {
-      console.error("Kunde inte starta databassessionen:", error);
-
-      alert(
-        "Det gick inte att skapa en session i databasen. " +
-        "Kontrollera Supabase-adressen, nyckeln, tabellkolumnerna " +
-        "och säkerhetspolicyerna (Row Level Security). " +
-        "Detaljer: " + error.message
-      );
-
-      $("startButton").disabled = false;
-      $("startButton").textContent = "Börja testet";
+      sessionId = participantId;
     }
+
+    $("intro").classList.add("hidden");
+    $("results").classList.add("hidden");
+
+    showPartInstructions();
+
+  } catch (error) {
+    console.error(
+      "Kunde inte starta databassessionen:",
+      error
+    );
+
+    alert(
+      "Det gick inte att starta testet. " +
+      "Kontrollera databasen och säkerhetspolicyerna. " +
+      "Detaljer: " + (error.message || String(error))
+    );
+
+  } finally {
+    $("startButton").disabled = false;
+    $("startButton").textContent = "Börja testet";
   }
+}
+
 
   async function finishTest() {
     clearInterval(timer);
